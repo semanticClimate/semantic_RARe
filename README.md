@@ -1,3 +1,4 @@
+# Colab Notebook link : https://colab.research.google.com/drive/1nktFH9fynRQxQHWj4eC37gut7ODrTGaI?usp=sharing
 # 🌐 semantic_RARe (OT-ViRaRe)
 
 **Open Tools and Visitation Frameworks for Global Research Assessment Reform**
