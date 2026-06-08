@@ -1,1 +1,1 @@
-# semantic_RARe
+# semantic_research assessment reform
