@@ -1,0 +1,8 @@
+# .gitignore
+venv/
+__pycache__/
+.env
+data/raw/*
+data/extracted/*
+!data/raw/.gitkeep
+!data/extracted/.gitkeep
