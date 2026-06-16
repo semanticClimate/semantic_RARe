@@ -49,15 +49,13 @@ semantic_RARe/
 ## ⚙️ Quick Start & Installation
 
 ### 1. Prerequisites
-
 Ensure you have Python 3.9+ installed. You will also need an active [Groq API Key](https://console.groq.com/) for the local entity extraction and chat generation phases.
 
 ### 2. Installation
-
 Clone the repository and install the required dependencies:
 
 ```bash
-git clone [https://github.com/semanticClimate/semantic_RARe.git](https://github.com/semanticClimate/semantic_RARe.git)
+git clone https://github.com/semanticClimate/semantic_RARe.git
 cd semantic_RARe
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
@@ -67,12 +65,25 @@ pip install -r requirements.txt
 
 ### 3. Environment Setup
 
-Export your API key to your terminal session:
+Set your API key as an environment variable in your terminal:
 
 ```bash
+# On Mac/Linux:
 export GROQ_API_KEY="your_api_key_here"
 
+# On Windows (Command Prompt):
+set GROQ_API_KEY=your_api_key_here
+
+# On Windows (PowerShell):
+$env:GROQ_API_KEY="your_api_key_here"
+
 ```
+
+### 4. Prepare the Data
+
+Because this tool relies on local data visitation, you must provide the PDF you want to assess.
+
+* Place your target Annual Report PDF (e.g., `NIPGR_AR.pdf`) into the `data/raw/` directory before running the pipeline.
 
 ---
 
@@ -86,7 +97,6 @@ Process a massive PDF asynchronously to build the local databases. This will saf
 
 ```bash
 python main.py ingest data/raw/NIPGR_AR.pdf --name nipgr
-
 ```
 
 ### 2. Generate a Standardized Assessment Report
@@ -95,7 +105,6 @@ Automatically generate a standardized Markdown report comparing labs, funding ag
 
 ```bash
 python main.py report nipgr
-
 ```
 
 ### 3. Interactive Assessment Chat
@@ -104,7 +113,6 @@ Launch the hallucination-safe terminal to query the Knowledge Graph and Vector D
 
 ```bash
 python main.py chat nipgr
-
 ```
 
 ---
