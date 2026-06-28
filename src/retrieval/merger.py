@@ -1,5 +1,5 @@
 from src.retrieval.vector_search import search_vectors
-from src.retrieval.graph_search import load_graph, search_graph
+from src.retrieval.graph_search import load_all_historical_graphs, search_graph
 
 def get_hybrid_context(query: str, institute_name: str) -> str:
     """
@@ -7,7 +7,7 @@ def get_hybrid_context(query: str, institute_name: str) -> str:
     """
     # 1. Get Graph Facts
     try:
-        KG = load_graph(institute_name)
+        KG = load_all_historical_graphs(institute_name)
         graph_facts = search_graph(query, KG)
     except Exception as e:
         graph_facts = [f"Graph Error: {str(e)}"]

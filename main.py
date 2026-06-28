@@ -9,6 +9,7 @@ from src.ingestion.db_builder import build_databases
 from src.retrieval.merger import get_hybrid_context
 from src.graph.guardrail import verify_factual_grounding
 from src.retrieval.reporter import generate_markdown_report
+from src.graph.exporter import export_to_graphml
 
 app = typer.Typer(
     name="virare",
@@ -24,18 +25,40 @@ def get_api_key():
         raise typer.Exit(code=1)
     return api_key
 
+# Import the new dynamic temporal reporter inside main.py
+from src.retrieval.temporal_reporter import generate_temporal_assessment
+
+# Update the ingest command signature
 @app.command()
-def ingest(pdf_path: str, institute_name: str = typer.Option(..., "--name", "-n", help="Short name of the institute")):
-    """Ingest a PDF report, extract entities, and build the databases."""
+def ingest(
+    pdf_path: str, 
+    institute_name: str = typer.Option(..., "--name", "-n", help="Short name of the institute"),
+    year: int = typer.Option(..., "--year", "-y", help="Financial Year of the annual report (e.g., 2024)")
+):
+    """Ingest a specific year's PDF report, updating the local historical repository."""
     api_key = get_api_key()
-    console.print(f"[bold cyan]🚀 Initializing Data Visitation Ingestion for:[/bold cyan] {institute_name.upper()}")
+    console.print(f"[bold cyan]🚀 Initializing Data Visitation Ingestion for:[/bold cyan] {institute_name.upper()} (Year: {year})")
     try:
-        json_path, chroma_path, rel_count = build_databases(pdf_path, institute_name, api_key)
-        console.print("\n[bold green]✅ Ingestion Complete![/bold green]")
-        console.print(f"🕸️ Knowledge Graph saved to: [yellow]{json_path}[/yellow] ({rel_count} relationships)")
+        json_path, chroma_path, rel_count = build_databases(pdf_path, institute_name, year, api_key)
+        console.print(f"\n[bold green]✅ Year {year} Ingestion Complete![/bold green]")
     except Exception as e:
         console.print(f"\n[bold red]❌ Pipeline Failed:[/bold red] {str(e)}")
         raise typer.Exit(code=1)
+
+# Add the new temporal report command at the bottom of main.py
+@app.command()
+def temporal_report(institute_name: str):
+    """
+    Generate a 10-year chronological trend analysis across all ingested historical reports.
+    """
+    api_key = get_api_key()
+    console.print(f"[bold yellow]📅 Activating Decadal Temporal Assessment for:[/bold yellow] {institute_name.upper()}")
+    try:
+        output_path = generate_temporal_assessment(institute_name, api_key)
+        console.print(f"\n[bold green]✅ Temporal Trend Report Compiled![/bold green]")
+        console.print(f"📄 Saved to: [yellow]{output_path}[/yellow]")
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Assessment Failed:[/bold red] {str(e)}")
 
 @app.command()
 def chat(institute_name: str):
@@ -54,6 +77,7 @@ def chat(institute_name: str):
     Answer the user's question in clear, natural language using ONLY the provided Context Facts. 
     Do not just copy-paste the raw graph edges (e.g., 'A [RELATION] B'); synthesize them into proper sentences. 
     If the context lacks the answer, output exactly: 'Data not available in the processed report.'"""
+
 
     while True:
         user_input = typer.prompt("\n🧑‍🔬 Ask")
@@ -102,6 +126,20 @@ def report(institute_name: str):
         console.print(f"📄 Saved to: [yellow]{output_path}[/yellow]")
     except Exception as e:
         console.print(f"\n[bold red]❌ Report Generation Failed:[/bold red] {str(e)}")
+
+@app.command()
+def export(institute_name: str):
+    """
+    Export the institute's Knowledge Graph into a Cytoscape-compatible .graphml file.
+    """
+    console.print(f"[bold cyan]🕸️ Exporting Knowledge Graph for {institute_name.upper()} to GraphML format...[/bold cyan]")
+    try:
+        output_path = export_to_graphml(institute_name)
+        console.print(f"\n[bold green]✅ GraphML Export Complete![/bold green]")
+        console.print(f"📊 File saved to: [yellow]{output_path}[/yellow]")
+        console.print("[dim]You can now directly drag and drop this file into Cytoscape! [/dim]")
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Export Failed:[/bold red] {str(e)}")
 
 if __name__ == "__main__":
     app()
